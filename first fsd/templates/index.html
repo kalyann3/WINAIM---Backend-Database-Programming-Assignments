@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 8px;
+            margin: 5px;
+        }
+        button {
+            cursor: pointer;
+        }
+        .entity-section {
+            margin-bottom: 40px;
+        }
+        .entity-list {
+            margin: 10px 0;
+        }
+        .entity-item {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Customer Relationship Management (CRM)</h1>
+    <div id="app">
+        <!-- Customer Section -->
+        <div class="entity-section">
+            <h2>Customers</h2>
+            <button onclick="loadCustomers()">Load Customers</button>
+            <div class="entity-list" id="customers"></div>
+            
+            <h3>Add New Customer</h3>
+            <form id="customerForm">
+                <input type="text" id="name" placeholder="Name" required>
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="text" id="phone" placeholder="Phone">
+                <input type="text" id="address" placeholder="Address">
+                <button type="submit">Add Customer</button>
+            </form>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="entity-section">
+            <h2>Contacts</h2>
+            <button onclick="loadContacts()">Load Contacts</button>
+            <div class="entity-list" id="contacts"></div>
+            
+            <h3>Add New Contact</h3>
+            <form id="contactForm">
+                <input type="text" id="contactName" placeholder="Name" required>
+                <input type="email" id="contactEmail" placeholder="Email" required>
+                <input type="text" id="contactPhone" placeholder="Phone">
+                <input type="number" id="contactCustomerId" placeholder="Customer ID" required>
+                <button type="submit">Add Contact</button>
+            </form>
+        </div>
+
+        <!-- Opportunity Section -->
+        <div class="entity-section">
+            <h2>Opportunities</h2>
+            <button onclick="loadOpportunities()">Load Opportunities</button>
+            <div class="entity-list" id="opportunities"></div>
+            
+            <h3>Add New Opportunity</h3>
+            <form id="opportunityForm">
+                <input type="text" id="opportunityDescription" placeholder="Description" required>
+                <input type="text" id="opportunityStage" placeholder="Stage" required>
+                <input type="number" id="opportunityCustomerId" placeholder="Customer ID" required>
+                <button type="submit">Add Opportunity</button>
+            </form>
+        </div>
+
+        <!-- Interaction Section -->
+        <div class="entity-section">
+            <h2>Interactions</h2>
+            <button onclick="loadInteractions()">Load Interactions</button>
+            <div class="entity-list" id="interactions"></div>
+            
+            <h3>Add New Interaction</h3>
+            <form id="interactionForm">
+                <input type="text" id="interactionType" placeholder="Type" required>
+                <input type="datetime-local" id="interactionDate" placeholder="Date" required>
+                <input type="text" id="interactionNotes" placeholder="Notes">
+                <input type="number" id="interactionCustomerId" placeholder="Customer ID" required>
+                <button type="submit">Add Interaction</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function loadCustomers() {
+            fetch('/customers')
+                .then(response => response.json())
+                .then(data => {
+                    const customersDiv = document.getElementById('customers');
+                    customersDiv.innerHTML = '';
+                    data.forEach(customer => {
+                        const customerDiv = document.createElement('div');
+                        customerDiv.classList.add('entity-item');
+                        customerDiv.textContent = `ID: ${customer.id}, Name: ${customer.name}, Email: ${customer.email}, Phone: ${customer.phone}, Address: ${customer.address}`;
+                        customersDiv.appendChild(customerDiv);
+                    });
+                });
+        }
+
+        function loadContacts() {
+            fetch('/contacts')
+                .then(response => response.json())
+                .then(data => {
+                    const contactsDiv = document.getElementById('contacts');
+                    contactsDiv.innerHTML = '';
+                    data.forEach(contact => {
+                        const contactDiv = document.createElement('div');
+                        contactDiv.classList.add('entity-item');
+                        contactDiv.textContent = `ID: ${contact.id}, Name: ${contact.name}, Email: ${contact.email}, Phone: ${contact.phone}, Customer ID: ${contact.customer_id}`;
+                        contactsDiv.appendChild(contactDiv);
+                    });
+                });
+        }
+
+        function loadOpportunities() {
+            fetch('/opportunities')
+                .then(response => response.json())
+                .then(data => {
+                    const opportunitiesDiv = document.getElementById('opportunities');
+                    opportunitiesDiv.innerHTML = '';
+                    data.forEach(opportunity => {
+                        const opportunityDiv = document.createElement('div');
+                        opportunityDiv.classList.add('entity-item');
+                        opportunityDiv.textContent = `ID: ${opportunity.id}, Description: ${opportunity.description}, Stage: ${opportunity.stage}, Customer ID: ${opportunity.customer_id}`;
+                        opportunitiesDiv.appendChild(opportunityDiv);
+                    });
+                });
+        }
+
+        function loadInteractions() {
+            fetch('/interactions')
+                .then(response => response.json())
+                .then(data => {
+                    const interactionsDiv = document.getElementById('interactions');
+                    interactionsDiv.innerHTML = '';
+                    data.forEach(interaction => {
+                        const interactionDiv = document.createElement('div');
+                        interactionDiv.classList.add('entity-item');
+                        interactionDiv.textContent = `ID: ${interaction.id}, Type: ${interaction.type}, Date: ${interaction.date}, Notes: ${interaction.notes}, Customer ID: ${interaction.customer_id}`;
+                        interactionsDiv.appendChild(interactionDiv);
+                    });
+                });
+        }
+
+        document.getElementById('customerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            fetch('/customers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, phone, address })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadCustomers();
+                this.reset();
+            });
+        });
+
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const phone = document.getElementById('contactPhone').value;
+            const customer_id = document.getElementById('contactCustomerId').value;
+            fetch('/contacts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, phone, customer_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadContacts();
+                this.reset();
+            });
+        });
+
+        document.getElementById('opportunityForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const description = document.getElementById('opportunityDescription').value;
+            const stage = document.getElementById('opportunityStage').value;
+            const customer_id = document.getElementById('opportunityCustomerId').value;
+            fetch('/opportunities', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ description, stage, customer_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadOpportunities();
+                this.reset();
+            });
+        });
+
+        document.getElementById('interactionForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const type = document.getElementById('interactionType').value;
+            const date = document.getElementById('interactionDate').value;
+            const notes = document.getElementById('interactionNotes').value;
+            const customer_id = document.getElementById('interactionCustomerId').value;
+            fetch('/interactions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ type, date, notes, customer_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadInteractions();
+                this.reset();
+            });
+        });
+    </script>
+</body>
+</html>
